@@ -2,6 +2,9 @@
 
 
 int main() {
+    //
+    std::srand(static_cast<unsigned>(NULL));
+
     //Game Loop
     Game game;
 
