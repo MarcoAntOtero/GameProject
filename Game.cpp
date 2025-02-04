@@ -9,10 +9,13 @@ void Game::initVar()
     this->window = nullptr;
 
     //Game Logic
+    this->endGame = false;
     this->points = 0;
+    this->health = 1000;
     this->enemySpawnTimerMax = 10.f;
     this->enemySpawnTimer = this->enemySpawnTimerMax;
     this->maxEnemies = 5;
+    this->mouseHeld = false;
 }
 
 void Game::initWindow() {
@@ -23,25 +26,32 @@ void Game::initWindow() {
     this->window->setFramerateLimit(60);
 }
 
-void Game::initEnemies() {
+void Game::initText() {
+    if (this->font.loadFromFile("/Users/marcootero/CLionProjects/test/Arial.ttf")) {
+        std::cerr << "Error loading Arial.ttf" << std::endl;
+    }
+    this->uiText.setFont(this->font);
+    this->uiText.setCharacterSize(30);
+    this->uiText.setFillColor(sf::Color::White);
+    this->uiText.setString("NONE");
+}
+
+/*void Game::initEnemies() {
     this->enemy.setPosition(sf::Vector2f(10.f, 10.f));
     this->enemy.setSize(sf::Vector2(50.f, 50.f));
-    this->enemy.setFillColor(sf::Color::Cyan);
+    this->enemy.setFillColor(sf::Color::Red);
 
-}
+}*/
 
 Game::Game() {
     this->initVar();
     this->initWindow();
-    this->initEnemies();
+    //this->initEnemies();
+    this->initText();
 }
 
 Game::~Game() {
     delete this->window;
-}
-//Accessors
-bool Game::getIsRunning() const {
-    return this->window->isOpen();
 }
 
 //Functions
@@ -49,9 +59,9 @@ void Game::spawnEnemy() {
     //Spawn enemies with random pos and random color & adds to vector
     this->enemy.setPosition(
         static_cast<float>(rand() % static_cast<int>(this->window->getSize().x - this->enemy.getSize().x)),
-        static_cast<float>(rand() % static_cast<int>(this->window->getSize().y - this->enemy.getSize().y)));
-
-    this->enemy.setFillColor(sf::Color::Green);
+        static_cast<float>(0));
+    this->enemy.setSize(sf::Vector2(50.f, 50.f));
+    this->enemy.setFillColor(sf::Color::Red);
     this->enemies.push_back(this->enemy);
 }
 
@@ -75,11 +85,25 @@ void Game::updateMousePos()
     this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
 }
 
+void Game::updateText() {
+    std::stringstream ss;
+    ss << "Points: " << this->points << std::endl;
+    ss << "Health: " << this->health << std::endl;
+    this->uiText.setString(ss.str());
+}
+
 void Game::update()
 {
     this->pollEvents();
-    this->updateMousePos();
-    this->updateEnemies();
+    if (!this->endGame) {
+        this->updateMousePos();
+        this->updateText();
+        this->updateEnemies();
+    }
+    //End game condition after enemies
+    if (this->health <= 0) {
+        this->endGame = true;
+    }
 }
 
 void Game::updateEnemies()
@@ -98,41 +122,52 @@ void Game::updateEnemies()
     }
     //Enemy movement
     for (int i = 0; i < this->enemies.size(); i++) {
-        bool deleted = false;
 
         this->enemies[i].move(0.f,5.f);
         //if enemy pressed on then deleted
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-            if (this->enemies[i].getGlobalBounds().contains(this->mousePosView)) {
-                deleted = true;
-                this->points +=  10;
-            }
-        }
-        //if enemy past bottom screen delete
         if (this->enemies[i].getPosition().y > this->window->getSize().y) {
-            deleted = true;
-            this->points += 10;
-        }
-        //Final delete
-        if (deleted) {
             this->enemies.erase(this->enemies.begin() + i);
+            this->health -= 1;
         }
     }
+    //Check if clicked upon
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (this->mouseHeld == false) {
+            this->mouseHeld = true;     //clicks on enemy mouseHeld set to true
+            bool deleted = false;
+            for (size_t i = 0; i < this->enemies.size() && deleted == false; i++) {
+                if (this->enemies[i].getGlobalBounds().contains(this->mousePosView)) {
+                    //Delete enemy
+                    deleted = true; //break for loop
+                    this->enemies.erase(this->enemies.begin() + i);
+
+                    //Add points
+                    this->points += 1;
+                }
+            }
+        }
+    }
+    else {this->mouseHeld = false;} //in the next frame reset to false when left mouse is clicked
 }
 
-void Game::renderEnemies() {
+void Game::renderText(sf::RenderTarget &target)
+{
+    target.draw(this->uiText);
+}
+
+void Game::renderEnemies(sf::RenderTarget& target) {
     for (auto &e : this->enemies) {
-        this->window->draw(e);
+        target.draw(e);
     }
 }
 
 void Game::render() {
+
     //clear frame
     this->window->clear();
-
     //Draw game objects
-    this->renderEnemies();
-
+    this->renderEnemies(*this->window);
+    this->renderText(*this->window);
     this->window->display();
 
 }

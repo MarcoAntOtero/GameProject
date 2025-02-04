@@ -10,6 +10,8 @@
 #include <SFML/Network.hpp>
 #include <vector>
 #include <ctime>
+#include <sstream>
+
 
 #ifndef GAME_H
 #define GAME_H
@@ -26,35 +28,46 @@ private:
     sf::Vector2i mousePosWindow;
     sf::Vector2f mousePosView;
 
+    //Text Display
+    sf::Text uiText;
+    sf::Font font;
+
     //Game Logic
+    bool endGame;
     unsigned points;    //only positive values
+    int health;
     float enemySpawnTimer;
     float enemySpawnTimerMax;
     int maxEnemies;
-
+    bool mouseHeld;
 
     //Game Objects
     sf::RectangleShape enemy;
     std::vector<sf::RectangleShape> enemies;
-
+    //sf::Texture playerTexture();
     //private functions
     void initVar();
     void initWindow();
-    void initEnemies();
+    void initText();
+    //void initEnemies();
 
 public:
     Game();
     virtual ~Game();
-    bool getIsRunning() const;
+
+    bool running() const {return this->window->isOpen();};
+    bool getEndGame() const {return this->endGame;}
 
     void spawnEnemy();
     void pollEvents();
 
     void updateMousePos();
+    void updateText();
     void update();
     void updateEnemies();
 
-    void renderEnemies();
+    void renderText(sf::RenderTarget& target); //not rendering to window
+    void renderEnemies(sf::RenderTarget& target);
     void render();
 };
 
