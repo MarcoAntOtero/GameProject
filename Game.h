@@ -2,19 +2,14 @@
 // Created by Marco Otero on 2/3/25.
 //
 #pragma once
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
-#include <vector>
-#include <ctime>
-#include <sstream>
 
+#include "Enemy.h"
+#include "Player.h"
 
 #ifndef GAME_H
 #define GAME_H
+
+const float enemySpawnTimerMax = 30.f;
 
 class Game
 {
@@ -34,17 +29,12 @@ private:
 
     //Game Logic
     bool endGame;
-    unsigned points;    //only positive values
-    int health;
-    float enemySpawnTimer;
-    float enemySpawnTimerMax;
-    int maxEnemies;
     bool mouseHeld;
+    sf::Clock clock; // enemy Timer
 
-    //Game Objects
-    sf::RectangleShape enemy;
-    std::vector<sf::RectangleShape> enemies;
-    //sf::Texture playerTexture();
+    Player player;
+    std::vector<Enemy*> enemies;
+
     //private functions
     void initVar();
     void initWindow();
@@ -57,17 +47,18 @@ public:
 
     bool running() const {return this->window->isOpen();};
     bool getEndGame() const {return this->endGame;}
-
-    void spawnEnemy();
     void pollEvents();
 
-    void updateMousePos();
-    void updateText();
-    void update();
-    void updateEnemies();
+    void spawnEnemy();
 
-    void renderText(sf::RenderTarget& target); //not rendering to window
-    void renderEnemies(sf::RenderTarget& target);
+    void updateMousePos();
+    void updateEnemies();
+    //void updateText();
+    void update();
+
+
+    //void renderText(sf::RenderTarget& target); //not rendering to window
+    void renderEnemies(sf::RenderTarget &target) const;
     void render();
 };
 
