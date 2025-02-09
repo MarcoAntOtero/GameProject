@@ -31,7 +31,7 @@ void Player::updatePlayerDirection(sf::RenderWindow &window) {
     sf::Vector2 mousePosView = window.mapPixelToCoords(mousePosWindow);
     float newAngle = atan2(mousePosView.y - this->player.getPosition().y,
                         mousePosView.x - this->player.getPosition().x);
-    float angleInDegrees = ((180.f / M_PI) * newAngle) + 90.f;
+    float angleInDegrees = ((180.f / M_PI) * newAngle) + 90.f; //adds 90degree turn because texture faces right in file
     if (angleInDegrees < 0.f) angleInDegrees += 360.f; // Ensure i always positive
     this->player.setRotation(angleInDegrees);
 
@@ -53,7 +53,6 @@ void Player::updatePlayer(sf::RenderWindow& window)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         this->player.move(10.f, 0.f);
     }
-    //std::cout << this->playerDirection << std::endl;
 }
 
 void Player::renderPlayer(sf::RenderTarget &target)

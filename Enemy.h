@@ -15,17 +15,22 @@ const int maxEnemies = 10;
 class Enemy {
 private:
     int health;
+    float enemyDirection;
     //Game Objects
     sf::Texture enemyTexture;
     sf::Sprite enemy;
 
 public:
+
     Enemy(sf::Vector2f position);
+
+    void updateEnemyDirection(const sf::Vector2f& playerPos);
+
     //Accessors
     sf::Vector2f getPosition() const { return enemy.getPosition(); }
     sf::FloatRect getGlobalBounds() const {return enemy.getGlobalBounds(); }
 
-    void updateEnemy();
+    void updateEnemy(const sf::Vector2f& playerPos);
     void renderEnemy(sf::RenderTarget& target) const;
 
 };

@@ -38,6 +38,7 @@ class Player {
 
     sf::FloatRect getGlobalBounds() const {return player.getGlobalBounds(); }
     void setPosition(float xPos, float yPos) {this->player.setPosition(xPos,yPos);}
+    sf::Vector2f getPosition() const {return this->player.getPosition();}
     void setOrigin(float xOrigin, float yOrigin) {this->player.setOrigin(xOrigin,yOrigin);}
 };
 

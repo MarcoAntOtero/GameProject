@@ -15,7 +15,7 @@ void Game::initVar()
 
 void Game::initWindow() {
     this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
-    this->window->setFramerateLimit(40);
+    this->window->setFramerateLimit(60);
 }
 
 void Game::initText() {
@@ -105,15 +105,15 @@ void Game::updateEnemies() {
     //Enemy movement
     for (int i = enemies.size() - 1; i >= 0; i--) {
         if (enemies.at(i) != nullptr) {    //have to check if not nullptr
-            enemies.at(i)->updateEnemy();
+            enemies.at(i)->updateEnemy(this->player.getPosition());
 
-            // If enemy moves off-screen, delete it
+            /* If enemy moves off-screen, delete it
             if (enemies[i]->getPosition().y > this->window->getSize().y) {
                 delete enemies[i];   // Free memory
                 enemies[i] = nullptr; // Prevent dangling pointer
                 enemies.erase(enemies.begin() + i);
                 this->player.setHealth(player.getHealth() - 1);
-            }
+            }*/
         }
     }
 
