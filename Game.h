@@ -9,7 +9,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-const float enemySpawnTimerMax = 30.f;
+const float enemySpawnTimerMax = 10.f;
 
 class Game
 {
@@ -39,6 +39,7 @@ private:
     void initVar();
     void initWindow();
     void initText();
+    void initPlayer();
     //void initEnemies();
 
 public:
@@ -53,11 +54,11 @@ public:
 
     void updateMousePos();
     void updateEnemies();
-    //void updateText();
+    void updateText();
     void update();
 
 
-    //void renderText(sf::RenderTarget& target); //not rendering to window
+    void renderText(sf::RenderTarget& target); //not rendering to window
     void renderEnemies(sf::RenderTarget &target) const;
     void render();
 };
