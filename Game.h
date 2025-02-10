@@ -40,7 +40,7 @@ private:
     void initWindow();
     void initText();
     void initPlayer();
-    //void initEnemies();
+    //void initEnemies(); //todo
 
 public:
     Game();

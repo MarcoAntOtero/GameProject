@@ -7,7 +7,6 @@
 void Game::initVar()
 {
     this->window = nullptr;
-
     //Game Logic
     this->endGame = false;
     this->mouseHeld = false;

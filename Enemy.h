@@ -16,6 +16,7 @@ class Enemy {
 private:
     int health;
     float enemyDirection;
+    float speed;
     //Game Objects
     sf::Texture enemyTexture;
     sf::Sprite enemy;
@@ -25,6 +26,7 @@ public:
     Enemy(sf::Vector2f position);
 
     void updateEnemyDirection(const sf::Vector2f& playerPos);
+    void updateEnemyMovement(const sf::Vector2f& playerPos);
 
     //Accessors
     sf::Vector2f getPosition() const { return enemy.getPosition(); }
