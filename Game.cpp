@@ -6,15 +6,19 @@
 //Private Functions
 void Game::initVar()
 {
+    //Window Variable
     this->window = nullptr;
+    this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
+    this->window->setFramerateLimit(60);
+    //this->window->setMouseCursorVisible(false);
+
+    //View Variable
+    view.setCenter(this->window->getSize().x / 2, this->window->getSize().y / 2);
+    view.setSize({2560.f, 1664.f});
+
     //Game Logic
     this->endGame = false;
     this->mouseHeld = false;
-}
-
-void Game::initWindow() {
-    this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
-    this->window->setFramerateLimit(60);
 }
 
 void Game::initText() {
@@ -44,7 +48,6 @@ void Game::initPlayer() {
 
 Game::Game() {
     this->initVar();
-    this->initWindow();
     this->initPlayer();
     this->initText();
 }
@@ -79,10 +82,20 @@ void Game::pollEvents()
     }
 }
 
-void Game::spawnEnemy() {
+void Game::spawnEnemy(sf::Vector2f playerPos) {
 
-    const float x = rand() % this->window->getSize().x;
-    const float y = rand() % this->window->getSize().y;
+    std::random_device rdx;
+    std::mt19937 genx(rdx());
+    std::uniform_int_distribution<int> distx(playerPos.x - (this->window->getSize().x / 2.f),
+                                            playerPos.x + (this->window->getSize().x / 2.f));
+
+    std::random_device rdy;
+    std::mt19937 geny(rdy());
+    std::uniform_int_distribution<int> disty(playerPos.y - (this->window->getSize().y / 2.f),
+                                            playerPos.y + (this->window->getSize().y / 2.f));
+
+    const float x = static_cast<float>(distx(genx));
+    const float y = static_cast<float>(disty(geny));
     this->enemies.push_back(new Enemy(sf::Vector2(x,y)));
 
 }
@@ -98,7 +111,7 @@ void Game::updateMousePos()
 void Game::updateEnemies() {
     // Ensure the number of enemies is always `maxEnemies`
     while (this->enemies.size() < maxEnemies) {
-        spawnEnemy();
+        spawnEnemy(this->player.getPosition());
     }
 
     //Enemy movement
@@ -119,7 +132,7 @@ void Game::updateEnemies() {
     //if equals maxSpawnTimer spawn new enemy and reset time
     if (clock.getElapsedTime().asSeconds() >= enemySpawnTimerMax)
     {
-        spawnEnemy();
+        spawnEnemy(this->player.getPosition());
         clock.restart();
     }
 
@@ -143,7 +156,7 @@ void Game::updateEnemies() {
                     //AddPoints
                     this->player.setPoints(player.getPoints() + 1);
 
-                    spawnEnemy();
+                    spawnEnemy(this->player.getPosition());
                 }
             }
         }
@@ -158,6 +171,12 @@ void Game::updateText() {
     ss << "Health: " << this->player.getHealth() << std::endl;
     this->uiText.setString(ss.str());
 }
+
+void Game::updateView() {
+    this->view.setCenter(player.getPosition());
+    this->window->setView(view);
+}
+
 void Game::update()
 {
     //all update functions
@@ -165,6 +184,7 @@ void Game::update()
     if (!this->endGame) {
         this->updateMousePos();
         this->updateText();
+        this->updateView();
         this->player.updatePlayer(*this->window);
         this->updateEnemies();
     }

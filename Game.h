@@ -2,7 +2,6 @@
 // Created by Marco Otero on 2/3/25.
 //
 #pragma once
-
 #include "Enemy.h"
 #include "Player.h"
 
@@ -18,6 +17,7 @@ private:
     sf::RenderWindow* window{}; //pointer
     sf::Event event{};
     sf::VideoMode videoMode;
+    sf::View view;
 
     //Mouse positions
     sf::Vector2i mousePosWindow;
@@ -37,7 +37,6 @@ private:
 
     //private functions
     void initVar();
-    void initWindow();
     void initText();
     void initPlayer();
     //void initEnemies(); //todo
@@ -50,11 +49,12 @@ public:
     bool getEndGame() const {return this->endGame;}
     void pollEvents();
 
-    void spawnEnemy();
+    void spawnEnemy(sf::Vector2f playerPos);
 
     void updateMousePos();
     void updateEnemies();
     void updateText();
+    void updateView();
     void update();
 
 

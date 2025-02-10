@@ -4,10 +4,9 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <vector>
-#include <ctime>
 #include <sstream>
 #include <cmath>
+#include <random>
 
 //in sfml moves clockwise
 enum Direction {UP = 270, DOWN = 90, LEFT = 180, RIGHT = 0};
