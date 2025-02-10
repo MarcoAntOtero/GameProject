@@ -2,19 +2,13 @@
 // Created by Marco Otero on 2/3/25.
 //
 #pragma once
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
-#include <vector>
-#include <ctime>
-#include <sstream>
-
+#include "Enemy.h"
+#include "Player.h"
 
 #ifndef GAME_H
 #define GAME_H
+
+const float enemySpawnTimerMax = 10.f;
 
 class Game
 {
@@ -23,6 +17,7 @@ private:
     sf::RenderWindow* window{}; //pointer
     sf::Event event{};
     sf::VideoMode videoMode;
+    sf::View view;
 
     //Mouse positions
     sf::Vector2i mousePosWindow;
@@ -34,22 +29,17 @@ private:
 
     //Game Logic
     bool endGame;
-    unsigned points;    //only positive values
-    int health;
-    float enemySpawnTimer;
-    float enemySpawnTimerMax;
-    int maxEnemies;
     bool mouseHeld;
+    sf::Clock clock; // enemy Timer
 
-    //Game Objects
-    sf::RectangleShape enemy;
-    std::vector<sf::RectangleShape> enemies;
-    //sf::Texture playerTexture();
+    Player player;
+    std::vector<Enemy*> enemies;
+
     //private functions
     void initVar();
-    void initWindow();
     void initText();
-    //void initEnemies();
+    void initPlayer();
+    //void initEnemies(); //todo
 
 public:
     Game();
@@ -57,17 +47,19 @@ public:
 
     bool running() const {return this->window->isOpen();};
     bool getEndGame() const {return this->endGame;}
-
-    void spawnEnemy();
     void pollEvents();
 
+    void spawnEnemy(sf::Vector2f playerPos);
+
     void updateMousePos();
-    void updateText();
-    void update();
     void updateEnemies();
+    void updateText();
+    void updateView();
+    void update();
+
 
     void renderText(sf::RenderTarget& target); //not rendering to window
-    void renderEnemies(sf::RenderTarget& target);
+    void renderEnemies(sf::RenderTarget &target) const;
     void render();
 };
 
