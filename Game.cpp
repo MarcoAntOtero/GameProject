@@ -12,7 +12,7 @@ void Game::initVar()
     this->window = nullptr;
     this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
     this->window->setFramerateLimit(60);
-    player = nullptr;
+    this->player = nullptr;
     //this->window->setMouseCursorVisible(false);
 
     //View Variable
@@ -46,7 +46,7 @@ void Game::initPlayer() {
     const float speed = 5.f;
     const float direction = 0.f;
 
-    this->player = new Player(*this->window,playerTexture,position,scale, origin, speed, direction);
+    this->player = new Player(*this->window,playerTexture,position,scale, origin, speed, direction, bullets);
 
 }
 
@@ -61,9 +61,13 @@ Game::~Game() {
     for (const auto &enemy : enemies) {
         delete enemy;
     }
+    for (const auto &bullet : bullets) {
+        delete bullet;
+    }
     delete this->player;
     enemies.clear();
 }
+
 
 /*
  *
@@ -88,6 +92,38 @@ void Game::pollEvents()
     }
 }
 
+void Game::checkCollision() {
+    for (size_t i = 0; i < this->bullets.size(); i++) {
+        if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()))
+        {
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
+            this->player->setHealth(this->player->getHealth() - 10);
+
+        }
+        for (const auto& enemy : enemies) {
+            if (bullets[i]->getGlobalBounds().intersects(enemy->getGlobalBounds()))
+            {
+                delete bullets[i];
+                bullets.erase(bullets.begin() + i);
+                enemy->setHealth(this->player->getHealth() - 10);
+            }
+        }
+    }
+}
+
+void Game::updateBullets() {
+    for (size_t i = 0; i < this->bullets.size(); i++) {
+        bullets[i]->update();
+        if (!bullets[i]->isActive())
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
+    }
+    checkCollision();
+}
+
+
+
 void Game::initEnemy(sf::Vector2f playerPos) {
 
     std::random_device rd;
@@ -105,9 +141,9 @@ void Game::initEnemy(sf::Vector2f playerPos) {
     const sf::Vector2f position(x,y);
     const sf::Vector2f scale(5.f, 5.f);
     const sf::Vector2f origin(8.f,8.f);
-    const float speed = 5.f;
+    const float speed = 10.f;
     const float direction = 90.f;
-    this->enemies.push_back(new Enemy(enemyTexture,position, scale, origin, speed, direction));
+    this->enemies.push_back(new Enemy(enemyTexture,position, scale, origin, speed, direction,bullets));
 }
 
 
@@ -137,7 +173,7 @@ void Game::updateEnemies() {
         clock.restart();
     }
 
-    // Check if clicked upon
+    /* Check if clicked upon
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
         if (!this->mouseHeld) {
             this->mouseHeld = true;
@@ -157,7 +193,7 @@ void Game::updateEnemies() {
         }
     } else {
         this->mouseHeld = false;
-    }
+    }*/
 }
 
 
@@ -183,12 +219,14 @@ void Game::update()
         this->updateView();
         this->player->update(); // Update player first
         this->updateEnemies();  // Update enemies
+        this->updateBullets();
     }
     //End game condition after enemies
     if (this->player->getHealth() <= 0) {
         this->endGame = true;
     }
 }
+
 
 /*
  *
@@ -211,5 +249,10 @@ void Game::render() {
     }
     this->player->render(*this->window);
     this->renderText(*this->window);
+
+    for (const Bullet* bullet : this->bullets) {
+        std::cout << "Rendering bullet at (" << bullet->getPosition().x << ", " << bullet->getPosition().y << ")" << std::endl;
+        bullet->render(*window);
+    }
     this->window->display();
 }

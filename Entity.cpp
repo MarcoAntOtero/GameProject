@@ -4,8 +4,10 @@
 
 #include "Entity.h"
 
+#include <iostream>
+
 Entity::Entity(const sf::Texture& texture, const sf::Vector2f& position, const sf::Vector2f& scale,
-    const sf::Vector2f& origin, float speed, float direction) {
+               const sf::Vector2f& origin, float speed, float direction, std::vector<Bullet*>& bullets) : bullets(bullets) {
     this->texture = texture;
     this->sprite.setTexture(this->texture);
     this->sprite.setPosition(position);
@@ -14,6 +16,7 @@ Entity::Entity(const sf::Texture& texture, const sf::Vector2f& position, const s
     this->speed = speed;
     this->sprite.setOrigin(origin.x, origin.y);
     this->sprite.setScale(scale.x, scale.y);
+    this->health = 100;
 }
 
 void Entity::render(sf::RenderTarget &target) const
@@ -23,16 +26,22 @@ void Entity::render(sf::RenderTarget &target) const
 
 
 Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::Vector2f &position,
-    const sf::Vector2f &scale, const sf::Vector2f &origin, float speed, float direction):
-    Entity(texture, position, scale, origin, speed, direction), window(window){
+    const sf::Vector2f &scale, const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets):
+    Entity(texture, position, scale, origin, speed, direction, bullets), window(window){
     this->points = 0;
     this->health = 100;
+    this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/playerBlast.png");
 }
 
-void Player::shooting() {
-    //if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-    //TODO
-    //}
+void Player::shoot(std::vector<Bullet*>& bullets) const {
+    float angle = this->sprite.getRotation() * (M_PI / 180);
+    float offset = sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at
+
+    sf::Vector2f bulletDirection(sin(angle), cos(angle));
+    const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
+
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,10.f));
+    std::cout << bullets.size() << " bullets created" << std::endl;
 }
 
 void Player::updatePlayerDirection() {
@@ -58,6 +67,9 @@ void Player::updatePlayerDirection() {
 void Player::update()
 {
     updatePlayerDirection();
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        shoot(bullets);
+    }
     //Move Player
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
         this->sprite.move(0.f, -10.f);
@@ -71,18 +83,26 @@ void Player::update()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         this->sprite.move(10.f, 0.f);
     }
-    //shooting function
-    shooting();
+    /*shooting function
+    for (const Bullet* bullet : this->bullets) {
+        std::cout << "Update bullet at (" << bullet->getPosition().x << ", " << bullet->getPosition().y << ")" << std::endl;
+        std::cout << this->bullets.size();
+    }*/
 }
 
 
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf::Vector2f &scale,
-    const sf::Vector2f &origin, float speed, float direction) :
-    Entity(texture, position, scale, origin, speed, direction) {
+    const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets) :
+    Entity(texture, position, scale, origin, speed, direction,bullets){
 
     this->speed = 5.f;
     this->health = 100;
 }
+
+void Enemy::shoot() {
+    //nothing
+}
+
 
 void Enemy::updateEnemyDirection() {
     /*

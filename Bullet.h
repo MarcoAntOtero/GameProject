@@ -5,18 +5,29 @@
 #ifndef BULLET_H
 #define BULLET_H
 #include "SFML/Graphics.hpp"
-
+#include <cmath>
 
 class Bullet {
     private:
     sf::Texture bulletTexture;
     sf::Sprite bullet;
+    float bulletDirection;
     sf::Vector2f bulletPosition;
-    sf::Vector2f bulletSpeed;
+    float bulletSpeed;
+    float bulletLifeTime;
+    bool active;
+    int bulletDamage;
 
     public:
-    Bullet();
+    Bullet(const sf::Texture &texture, float bulletDirection, const sf::Vector2f& bulletPosition,
+    float bulletSpeed);
 
+    sf::Vector2f getPosition() const {return bullet.getPosition();}
+
+    sf::FloatRect getGlobalBounds() const {return this->bullet.getGlobalBounds();}
+    bool isActive() const {return active;};
+    void update();
+    void render(sf::RenderTarget& target) const;
 };
 
 

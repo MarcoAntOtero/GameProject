@@ -35,29 +35,32 @@ private:
 
     Player* player;
     std::vector<Enemy*> enemies;
+    std::vector<Bullet*> bullets;
 
     //private functions
     void initVar();
     void initText();
     void initPlayer();
-    //void initEnemies(); //todo
+    void initEnemy(sf::Vector2f playerPos);
 
 public:
     Game();
     virtual ~Game();
 
+    void updateBullets();
+    void checkCollision();
+
     bool running() const {return this->window->isOpen();};
     bool getEndGame() const {return this->endGame;}
     void pollEvents();
 
-    void initEnemy(sf::Vector2f playerPos);
 
     void updateMousePos();
     void updateEnemies();
     void updateText();
     void updateView();
-    void update();
 
+    void update();
 
     void renderText(sf::RenderTarget& target);
     void render();
