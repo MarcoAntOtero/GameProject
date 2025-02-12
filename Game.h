@@ -2,8 +2,9 @@
 // Created by Marco Otero on 2/3/25.
 //
 #pragma once
-#include "Enemy.h"
-#include "Player.h"
+#include "Entity.h"
+#include <sstream>
+#include <random>
 
 #ifndef GAME_H
 #define GAME_H
@@ -32,7 +33,7 @@ private:
     bool mouseHeld;
     sf::Clock clock; // enemy Timer
 
-    Player player;
+    Player* player;
     std::vector<Enemy*> enemies;
 
     //private functions
@@ -49,7 +50,7 @@ public:
     bool getEndGame() const {return this->endGame;}
     void pollEvents();
 
-    void spawnEnemy(sf::Vector2f playerPos);
+    void initEnemy(sf::Vector2f playerPos);
 
     void updateMousePos();
     void updateEnemies();
@@ -58,8 +59,7 @@ public:
     void update();
 
 
-    void renderText(sf::RenderTarget& target); //not rendering to window
-    void renderEnemies(sf::RenderTarget &target) const;
+    void renderText(sf::RenderTarget& target);
     void render();
 };
 

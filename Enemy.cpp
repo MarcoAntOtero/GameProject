@@ -1,7 +1,7 @@
 //
 // Created by Marco Otero on 2/5/25.
 //
-
+/*
 #include "Enemy.h"
 
 #include <complex>
@@ -25,7 +25,7 @@ void Enemy::updateEnemyDirection(const sf::Vector2f& playerPos) {
      * Convert newAngle from radians to degrees for sfml
      * Ensure angle  always positive because arctan return negative values
      * Set new angle for enemy rotation
-     */
+
     float newAngle = atan2(playerPos.y - this->enemy.getPosition().y,
                         playerPos.x - this->enemy.getPosition().x);
 
@@ -54,3 +54,4 @@ void Enemy::updateEnemy(const sf::Vector2f& playerPos )
 void Enemy::renderEnemy(sf::RenderTarget& target) const {
     target.draw(this->enemy);
 }
+*/

@@ -1,7 +1,7 @@
 //
 // Created by Marco Otero on 2/5/25.
 //
-
+/*
 #include "Player.h"
 
 
@@ -17,7 +17,13 @@ Player::Player() {
     this->player.setScale(5.f, 5.f);
 }
 
-void Player::updatePlayerDirection(sf::RenderWindow &window) {
+void Player::shooting() {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+
+    }
+}
+
+void Player::updatePlayerDirection(const sf::RenderWindow &window) {
     //Direction player is facing updates every second and in radian
     this->playerDirection = (M_PI / 180) * this->player.getRotation();  //current angle of player
     /*
@@ -26,7 +32,7 @@ void Player::updatePlayerDirection(sf::RenderWindow &window) {
      * set new angle of player to match mouse
      * Arctan gives theta from y (sin) and x (cos)
      * Convert newAngle from radians to degrees for sfml
-     */
+
     sf::Vector2i mousePosWindow = sf::Mouse::getPosition(window);
     sf::Vector2 mousePosView = window.mapPixelToCoords(mousePosWindow);
     float newAngle = atan2(mousePosView.y - this->player.getPosition().y,
@@ -53,9 +59,12 @@ void Player::updatePlayer(sf::RenderWindow& window)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         this->player.move(10.f, 0.f);
     }
+    //shooting function
+    shooting();
 }
 
 void Player::renderPlayer(sf::RenderTarget &target)
 {
     target.draw(this->player, &this->playerTexture);
 }
+*/
