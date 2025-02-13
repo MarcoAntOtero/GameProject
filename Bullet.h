@@ -5,27 +5,32 @@
 #ifndef BULLET_H
 #define BULLET_H
 #include "SFML/Graphics.hpp"
+
 #include <cmath>
 
 class Bullet {
     private:
     sf::Texture bulletTexture;
     sf::Sprite bullet;
+    sf::Vector2f scale;
     float bulletDirection;
     sf::Vector2f bulletPosition;
     float bulletSpeed;
     float bulletLifeTime;
     bool active;
     int bulletDamage;
+    bool playerBullet;
 
     public:
     Bullet(const sf::Texture &texture, float bulletDirection, const sf::Vector2f& bulletPosition,
-    float bulletSpeed);
-    int getBulletDamage () const {return this->bulletDamage;};
-    sf::Vector2f getPosition() const {return this->bullet.getPosition();}
+        const sf::Vector2f& scale, float bulletSpeed, bool playerBullet);
 
+    bool getPlayerBullet() const{return playerBullet;}
+    int getBulletDamage () const {return this->bulletDamage;}
+    sf::Vector2f getPosition() const {return this->bullet.getPosition();}
     sf::FloatRect getGlobalBounds() const {return this->bullet.getGlobalBounds();}
-    bool isActive() const {return this->active;};
+    bool isActive() const {return this->active;}
+
     void update();
     void render(sf::RenderTarget& target) const;
 };

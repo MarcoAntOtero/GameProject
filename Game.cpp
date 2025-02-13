@@ -13,7 +13,6 @@ void Game::initVar()
     this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
     this->window->setFramerateLimit(60);
     this->player = nullptr;
-    //this->window->setMouseCursorVisible(false);
 
     //View Variable
     view.setCenter(this->window->getSize().x / 2, this->window->getSize().y / 2);
@@ -43,7 +42,7 @@ void Game::initPlayer() {
     const sf::Vector2f position(this->window->getSize().x / 2, this->window->getSize().y / 2);
     const sf::Vector2f scale(5.f, 5.f);
     const sf::Vector2f origin(8.f,8.f);
-    const float speed = 5.f;
+    const float speed = 15.0;
     const float direction = 0.f;
 
     this->player = new Player(*this->window,playerTexture,position,scale, origin, speed, direction, bullets);
@@ -94,20 +93,18 @@ void Game::pollEvents()
 
 void Game::checkCollision() {
     for (size_t i = 0; i < this->bullets.size(); i++) {
-        /*if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()))
+        if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()) && !bullets[i]->getPlayerBullet())
         {
-            //delete bullets[i];
-            bullets.erase(bullets.begin() + i);
             this->player->setHealth(this->player->getHealth() - bullets[i]->getBulletDamage());
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
 
-        }*/
+        }
         for (size_t j = 0; j < enemies.size(); j++) {
-            if (bullets[i]->getGlobalBounds().intersects(enemies[j]->getGlobalBounds()))
+            if (bullets[i]->getGlobalBounds().intersects(enemies[j]->getGlobalBounds()) && bullets[i]->getPlayerBullet())
             {
                 this->enemies[j]->setHealth(this->enemies[j]->getHealth() - bullets[i]->getBulletDamage());
-
                 delete bullets[i];      //delete bullet when intersects and lower enemy health
-
                 bullets.erase(bullets.begin() + i);
             }
         }
@@ -144,8 +141,8 @@ void Game::initEnemy(sf::Vector2f playerPos) {
     const sf::Vector2f position(x,y);
     const sf::Vector2f scale(5.f, 5.f);
     const sf::Vector2f origin(8.f,8.f);
-    const float speed = 10.f;
-    const float direction = 90.f;
+    const float speed = 10.0;
+    const float direction = 0.0;
     this->enemies.push_back(new Enemy(enemyTexture,position, scale, origin, speed, direction,bullets));
 }
 
@@ -153,9 +150,9 @@ void Game::initEnemy(sf::Vector2f playerPos) {
 
 void Game::updateEnemies() {
     // Ensure the number of enemies is always `maxEnemies`
-    while (this->enemies.size() < maxEnemies && enemyTimer.getElapsedTime().asSeconds() >= enemySpawnTimerMax) {
+    while (this->enemies.size() < maxEnemies && this->enemyTimer.getElapsedTime().asSeconds() >= enemySpawnTimerMax) {
         initEnemy(this->player->getPosition()); //adds enemy to vector
-        enemyTimer.restart();
+        this->enemyTimer.restart();
     }
 
     // Update enemies, where they move and
@@ -167,6 +164,8 @@ void Game::updateEnemies() {
             // Delete enemy
             delete enemies[i];
             enemies.erase(enemies.begin() + i);
+            this->player->setPoints(this->player->getPoints() + 10);
+            this->player->setHealth(this->player->getHealth() + 10);
         }
     }
 

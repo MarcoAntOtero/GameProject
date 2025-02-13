@@ -5,22 +5,25 @@
 #include "Bullet.h"
 
 Bullet::Bullet(const sf::Texture &texture, const float bulletDirection, const sf::Vector2f& bulletPosition,
-    const float bulletSpeed) {
+    const sf::Vector2f& scale, const float bulletSpeed, const bool playerBullet) {
 
-    this->bulletDamage = 10;
+    this->bulletDamage = 25;
+    this->bulletTexture = texture;
     this->bulletPosition = bulletPosition;
     this->bulletDirection = bulletDirection;
     this->bulletSpeed = bulletSpeed;
+    this->playerBullet = playerBullet;
     this->bulletLifeTime = 175.f;
-    this->bullet.setPosition(bulletPosition);
-
-    this->bullet.setTexture(texture);
-
-    this->bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2 );//16 x 16 bit png
-    this->bullet.setScale(3.0, 3.0);
     this->active = true;
+    this->scale = scale;
 
+    this->bullet.setPosition(bulletPosition);
     this->bullet.setRotation(this->bulletDirection * (180 / M_PI)); //have to convert back to degrees
+    this->bullet.setTexture(bulletTexture);
+    this->bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2 );//16 x 16 bit png
+    this->bullet.setScale(scale);
+
+
 }
 
 void Bullet::update() {

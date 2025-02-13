@@ -30,19 +30,21 @@ Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::V
     Entity(texture, position, scale, origin, speed, direction, bullets), window(window) {
     this->points = 0;
     if (!this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/playerBlast.png")){
-        std::cerr << "Failed to load texture" << std::endl;
+        std::cerr << "Failed to load player bullet texture" << std::endl;
     }
 }
 
-void Player::shoot(std::vector<Bullet*>& bullets) {
+void Player::shoot() {
+    bool playerBullet = true;
     //convert to  radians and adjust by 90 because player was adjusted by 90 player
     float angle = (this->sprite.getRotation() * (M_PI / 180)) - (M_PI / 2);
-    float offset = sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
+    float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
+    sf::Vector2f scale(4.0,4.0);
     sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
 
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,25.f));
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,25.f,playerBullet));
 }
 
 void Player::updatePlayerDirection() {
@@ -65,37 +67,46 @@ void Player::updatePlayerDirection() {
 
 }
 
+void Player::updatePlayerMovement() {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {this->sprite.move(0.0, -this->speed);}
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {this->sprite.move(-this->speed, 0.0);}
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {this->sprite.move(0.f, this->speed);}
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {this->sprite.move(this->speed, 0.f);}
+}
+
 void Player::update()
 {
     updatePlayerDirection();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        shoot(bullets);
+        if (this->entityClock.getElapsedTime().asSeconds() >= 0.5) {
+            shoot();
+            this->entityClock.restart();
+        }
+
     }
-    //Move Player
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        this->sprite.move(0.f, -10.f);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        this->sprite.move(-10.f, 0.f);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        this->sprite.move(0.f, 10.f);
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        this->sprite.move(10.f, 0.f);
-    }
+    updatePlayerMovement();
+
 }
 
 
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf::Vector2f &scale,
     const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets) :
     Entity(texture, position, scale, origin, speed, direction,bullets){
-
-    this->speed = 5.f;
+    if (!this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/Beam_Big_Green.png")){
+        std::cerr << "Failed to load enemy bullet texture" << std::endl;
+    }
 }
 
 void Enemy::shoot() {
-    //nothing
+    bool playerBullet = false;
+    float angle = (this->sprite.getRotation() * (M_PI / 180));  //convert to radians
+    float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
+
+    sf::Vector2f scale(1.5,1.5);
+    sf::Vector2f bulletDirection(cos(angle), sin(angle));
+    const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
+
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,25.f,playerBullet));
 }
 
 
@@ -131,4 +142,8 @@ void Enemy::update()
 {
     updateEnemyDirection();
     updateEnemyMovement();
+    if (this->entityClock.getElapsedTime().asSeconds() >= 0.5) {
+        shoot();
+        this->entityClock.restart();
+    }
 }

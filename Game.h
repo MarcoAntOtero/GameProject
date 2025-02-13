@@ -9,7 +9,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-constexpr float enemySpawnTimerMax = 5.0;
+constexpr float enemySpawnTimerMax = 2.5;
 
 class Game
 {
