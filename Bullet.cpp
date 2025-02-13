@@ -4,27 +4,30 @@
 
 #include "Bullet.h"
 
-Bullet::Bullet(const sf::Texture &texture, float bulletDirection, const sf::Vector2f& bulletPosition,
-    float bulletSpeed) {
+Bullet::Bullet(const sf::Texture &texture, const float bulletDirection, const sf::Vector2f& bulletPosition,
+    const float bulletSpeed) {
 
-    this->bulletDamage = 25;
+    this->bulletDamage = 10;
     this->bulletPosition = bulletPosition;
     this->bulletDirection = bulletDirection;
     this->bulletSpeed = bulletSpeed;
-    this->bulletLifeTime = 5.f;
+    this->bulletLifeTime = 175.f;
     this->bullet.setPosition(bulletPosition);
 
     this->bullet.setTexture(texture);
 
     this->bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2 );//16 x 16 bit png
-    this->bullet.setScale(1.f, 1.f);
+    this->bullet.setScale(2.0, 2.0);
     this->active = true;
+
+    this->bullet.setRotation(this->bulletDirection * (180 / M_PI)); //have to convert back to degrees
 }
 
 void Bullet::update() {
-    this->bullet.move(sin(this->bulletDirection) * this->bulletSpeed, cos(this->bulletDirection) * this->bulletSpeed);
+    //bullet direction is angle and move it by the cos(x direction) and sin(y direction)
+    this->bullet.move(cos(this->bulletDirection) * this->bulletSpeed, sin(this->bulletDirection) * this->bulletSpeed);
     this->bulletLifeTime -= 1.f;
-    if(this->bulletLifeTime <= 0) {this->active = false;}
+    if(this->bulletLifeTime < 0) {this->active = false;}
 }
 
 void Bullet::render(sf::RenderTarget &target) const {

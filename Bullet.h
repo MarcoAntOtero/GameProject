@@ -21,11 +21,11 @@ class Bullet {
     public:
     Bullet(const sf::Texture &texture, float bulletDirection, const sf::Vector2f& bulletPosition,
     float bulletSpeed);
-
-    sf::Vector2f getPosition() const {return bullet.getPosition();}
+    int getBulletDamage () const {return this->bulletDamage;};
+    sf::Vector2f getPosition() const {return this->bullet.getPosition();}
 
     sf::FloatRect getGlobalBounds() const {return this->bullet.getGlobalBounds();}
-    bool isActive() const {return active;};
+    bool isActive() const {return this->active;};
     void update();
     void render(sf::RenderTarget& target) const;
 };

@@ -27,20 +27,22 @@ void Entity::render(sf::RenderTarget &target) const
 
 Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::Vector2f &position,
     const sf::Vector2f &scale, const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets):
-    Entity(texture, position, scale, origin, speed, direction, bullets), window(window){
+    Entity(texture, position, scale, origin, speed, direction, bullets), window(window) {
     this->points = 0;
-    this->health = 100;
-    this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/playerBlast.png");
+    if (!this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/playerBlast.png")){
+        std::cerr << "Failed to load texture" << std::endl;
+    }
 }
 
-void Player::shoot(std::vector<Bullet*>& bullets) const {
-    float angle = this->sprite.getRotation() * (M_PI / 180);
-    float offset = sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at
+void Player::shoot(std::vector<Bullet*>& bullets) {
+    //convert to  radians and adjust by 90 because player was adjusted by 90 player
+    float angle = (this->sprite.getRotation() * (M_PI / 180)) - (M_PI / 2);
+    float offset = sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
-    sf::Vector2f bulletDirection(sin(angle), cos(angle));
+    sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
 
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,10.f));
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,20.f));
     std::cout << bullets.size() << " bullets created" << std::endl;
 }
 
@@ -96,7 +98,6 @@ Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf:
     Entity(texture, position, scale, origin, speed, direction,bullets){
 
     this->speed = 5.f;
-    this->health = 100;
 }
 
 void Enemy::shoot() {

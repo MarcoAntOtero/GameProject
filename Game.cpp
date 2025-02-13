@@ -94,13 +94,13 @@ void Game::pollEvents()
 
 void Game::checkCollision() {
     for (size_t i = 0; i < this->bullets.size(); i++) {
-        if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()))
+        /*if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()))
         {
-            delete bullets[i];
+            //delete bullets[i];
             bullets.erase(bullets.begin() + i);
-            this->player->setHealth(this->player->getHealth() - 10);
+            this->player->setHealth(this->player->getHealth() - bullets[i]->getBulletDamage());
 
-        }
+        }*/
         for (const auto& enemy : enemies) {
             if (bullets[i]->getGlobalBounds().intersects(enemy->getGlobalBounds()))
             {
@@ -115,9 +115,10 @@ void Game::checkCollision() {
 void Game::updateBullets() {
     for (size_t i = 0; i < this->bullets.size(); i++) {
         bullets[i]->update();
-        if (!bullets[i]->isActive())
+        if (!bullets[i]->isActive()) {
             delete bullets[i];
             bullets.erase(bullets.begin() + i);
+        }
     }
     checkCollision();
 }
@@ -244,15 +245,20 @@ void Game::render() {
 
     //clear frame
     this->window->clear();
-    for (const auto& enemy : this->enemies) {
-        enemy->render(*window);
-    }
+
     this->player->render(*this->window);
     this->renderText(*this->window);
-
-    for (const Bullet* bullet : this->bullets) {
+    /*for (const Bullet* bullet : this->bullets) {
         std::cout << "Rendering bullet at (" << bullet->getPosition().x << ", " << bullet->getPosition().y << ")" << std::endl;
         bullet->render(*window);
+    }*/
+    //std::cout << bullets.size() << std::endl;
+    for (size_t i = 0; i < this->bullets.size(); i++)
+    {
+        this->bullets[i]->render(*window);
+    }
+    for (const auto& enemy : this->enemies) {
+        enemy->render(*window);
     }
     this->window->display();
 }

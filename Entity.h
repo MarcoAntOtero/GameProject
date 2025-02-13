@@ -53,7 +53,7 @@ public:
 
 
 
-    void shoot(std::vector<Bullet*>& bullets) const;
+    void shoot(std::vector<Bullet*>& bullets) ;
 
     void update() override;
     void updatePlayerDirection();
