@@ -1,13 +1,9 @@
 #include "Game.h"
-
+#include <iostream>
 
 int main() {
-    //
-    std::srand(static_cast<unsigned>(NULL));
-
     //Game Loop
     Game game;
-
     while (game.running() && !game.getEndGame())
     {
         //Update game loop

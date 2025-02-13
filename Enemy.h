@@ -1,9 +1,9 @@
 //
 // Created by Marco Otero on 2/5/25.
-//
+/*
 #pragma once
 #include <SFML/Graphics.hpp>
-
+#include "Bullet.h"
 
 #ifndef ENEMY_H
 #define ENEMY_H
@@ -37,3 +37,4 @@ public:
 
 
 #endif //ENEMY_H
+*/

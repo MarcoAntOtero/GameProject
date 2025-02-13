@@ -2,26 +2,22 @@
 // Created by Marco Otero on 2/3/25.
 //
 #pragma once
-#include "Enemy.h"
-#include "Player.h"
+#include "Entity.h"
+#include <sstream>
+#include <random>
 
 #ifndef GAME_H
 #define GAME_H
 
-const float enemySpawnTimerMax = 10.f;
+constexpr float enemySpawnTimerMax = 2.5;
 
 class Game
 {
 private:
     //Variable & Window
-    sf::RenderWindow* window{}; //pointer
+    sf::RenderWindow* window{}; //
     sf::Event event{};
-    sf::VideoMode videoMode;
-    sf::View view;
-
-    //Mouse positions
-    sf::Vector2i mousePosWindow;
-    sf::Vector2f mousePosView;
+    sf::View view;  //needed so window follows player as it moves
 
     //Text Display
     sf::Text uiText;
@@ -30,36 +26,39 @@ private:
     //Game Logic
     bool endGame;
     bool mouseHeld;
-    sf::Clock clock; // enemy Timer
+    sf::Clock enemyTimer; // enemy Timer for respawn
 
-    Player player;
+    //Game entities and bullets
+    Player* player;
     std::vector<Enemy*> enemies;
+    std::vector<Bullet*> bullets;
 
     //private functions
     void initVar();
     void initText();
     void initPlayer();
-    //void initEnemies(); //todo
+    void initEnemy(sf::Vector2f playerPos);
 
 public:
     Game();
     virtual ~Game();
 
+
+    void checkCollision();
+
     bool running() const {return this->window->isOpen();};
     bool getEndGame() const {return this->endGame;}
     void pollEvents();
 
-    void spawnEnemy(sf::Vector2f playerPos);
 
-    void updateMousePos();
+    //Update functions
+    void updateBullets();
     void updateEnemies();
     void updateText();
     void updateView();
     void update();
 
-
-    void renderText(sf::RenderTarget& target); //not rendering to window
-    void renderEnemies(sf::RenderTarget &target) const;
+    void renderText(sf::RenderTarget& target);
     void render();
 };
 
