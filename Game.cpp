@@ -101,12 +101,14 @@ void Game::checkCollision() {
             this->player->setHealth(this->player->getHealth() - bullets[i]->getBulletDamage());
 
         }*/
-        for (const auto& enemy : enemies) {
-            if (bullets[i]->getGlobalBounds().intersects(enemy->getGlobalBounds()))
+        for (size_t j = 0; j < enemies.size(); j++) {
+            if (bullets[i]->getGlobalBounds().intersects(enemies[j]->getGlobalBounds()))
             {
-                delete bullets[i];
+                this->enemies[j]->setHealth(this->enemies[j]->getHealth() - bullets[i]->getBulletDamage());
+
+                delete bullets[i];      //delete bullet when intersects and lower enemy health
+
                 bullets.erase(bullets.begin() + i);
-                enemy->setHealth(this->player->getHealth() - 10);
             }
         }
     }
@@ -126,7 +128,7 @@ void Game::updateBullets() {
 
 
 void Game::initEnemy(sf::Vector2f playerPos) {
-
+    //needs playerpos so the enemy can follow it
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(playerPos.x - (this->window->getSize().x / 2.f),
@@ -148,53 +150,26 @@ void Game::initEnemy(sf::Vector2f playerPos) {
 }
 
 
-void Game::updateMousePos()
-{
-    //Updates window mouse position(Vector2i)
-    this->mousePosWindow = sf::Mouse::getPosition(*this->window);
-    this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
-}
 
 void Game::updateEnemies() {
     // Ensure the number of enemies is always `maxEnemies`
-    const sf::Vector2f playerPos = this->player->getPosition();
-    while (this->enemies.size() < maxEnemies) {
-        initEnemy(playerPos);
+    while (this->enemies.size() < maxEnemies && enemyTimer.getElapsedTime().asSeconds() >= enemySpawnTimerMax) {
+        initEnemy(this->player->getPosition()); //adds enemy to vector
+        enemyTimer.restart();
     }
 
-    // Update enemies
+    // Update enemies, where they move and
     for (size_t i = 0; i < enemies.size(); i++) {
-        enemies[i]->setPlayerPos(playerPos);
+
+        enemies[i]->setPlayerPos(this->player->getPosition());
         enemies[i]->update();
-    }
-
-    // Spawn new enemies based on a timer
-    if (clock.getElapsedTime().asSeconds() >= enemySpawnTimerMax) {
-        initEnemy(playerPos);
-        clock.restart();
-    }
-
-    /* Check if clicked upon
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-        if (!this->mouseHeld) {
-            this->mouseHeld = true;
-            for (size_t i = 0; i < this->enemies.size(); i++) {
-                if (this->enemies[i]->getGlobalBounds().contains(this->mousePosView)) {
-                    // Delete enemy
-                    enemies.erase(enemies.begin() + i);
-
-                    // Add points
-                    this->player->setPoints(this->player->getPoints() + 1);
-
-                    // Spawn a new enemy
-                    initEnemy(playerPos);
-                    break; // Exit loop after deleting one enemy
-                }
-            }
+        if (this->enemies[i]->getHealth() <= 0) {
+            // Delete enemy
+            delete enemies[i];
+            enemies.erase(enemies.begin() + i);
         }
-    } else {
-        this->mouseHeld = false;
-    }*/
+    }
+
 }
 
 
@@ -215,7 +190,6 @@ void Game::update()
     //all update functions
     this->pollEvents();
     if (!this->endGame) {
-        this->updateMousePos();
         this->updateText();
         this->updateView();
         this->player->update(); // Update player first

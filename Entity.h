@@ -20,18 +20,18 @@ public:
            const sf::Vector2f &origin,
            float speed, float direction, std::vector<Bullet*>& bullets);
 
-    virtual ~Entity() = default;
+    virtual ~Entity() = default;//nothing to do
 
     virtual void update() = 0;  // Pure virtual function (abstract)
 
-
     void render(sf::RenderTarget& target) const;
 
-    sf::Vector2f getPosition() const { return sprite.getPosition(); }
-    sf::FloatRect getGlobalBounds() const { return sprite.getGlobalBounds(); }
+    //all used in game.cpp because private member
+    virtual sf::Vector2f getPosition() const { return sprite.getPosition(); }
+    virtual sf::FloatRect getGlobalBounds() const { return sprite.getGlobalBounds(); }
 
-    void setPosition(float x, float y) { sprite.setPosition(x, y); }
-    void setOrigin(float x, float y) { sprite.setOrigin(x, y); }
+    virtual void setPosition(float x, float y) { sprite.setPosition(x, y); }
+    virtual void setOrigin(float x, float y) { sprite.setOrigin(x, y); }
 
     virtual int getHealth() const {return this->health;}
     virtual void setHealth(const int health) {this->health = health;}
@@ -61,7 +61,7 @@ public:
 
 class Enemy : public Entity {
 private:
-    sf::Vector2f playerPos;
+    sf::Vector2f playerPos; //need to track
 
 public:
     Enemy(const sf::Texture &texture, const sf::Vector2f &position, const sf::Vector2f &scale,
@@ -69,8 +69,9 @@ public:
 
     void shoot();
     void update() override;
+
     void setPlayerPos(const sf::Vector2f& playerPos) { this->playerPos = playerPos; }
-    sf::Vector2f getPlayerPos() const { return playerPos; }
+    sf::Vector2f getPlayerPos() const { return playerPos; } //used in game.cpp because private member
 
     void updateEnemyDirection();
     void updateEnemyMovement();

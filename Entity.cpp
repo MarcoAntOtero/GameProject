@@ -42,8 +42,7 @@ void Player::shoot(std::vector<Bullet*>& bullets) {
     sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
 
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,20.f));
-    std::cout << bullets.size() << " bullets created" << std::endl;
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,25.f));
 }
 
 void Player::updatePlayerDirection() {
@@ -85,11 +84,6 @@ void Player::update()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
         this->sprite.move(10.f, 0.f);
     }
-    /*shooting function
-    for (const Bullet* bullet : this->bullets) {
-        std::cout << "Update bullet at (" << bullet->getPosition().x << ", " << bullet->getPosition().y << ")" << std::endl;
-        std::cout << this->bullets.size();
-    }*/
 }
 
 

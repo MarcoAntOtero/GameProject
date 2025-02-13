@@ -17,7 +17,7 @@ Bullet::Bullet(const sf::Texture &texture, const float bulletDirection, const sf
     this->bullet.setTexture(texture);
 
     this->bullet.setOrigin(bullet.getLocalBounds().width / 2, bullet.getLocalBounds().height / 2 );//16 x 16 bit png
-    this->bullet.setScale(2.0, 2.0);
+    this->bullet.setScale(3.0, 3.0);
     this->active = true;
 
     this->bullet.setRotation(this->bulletDirection * (180 / M_PI)); //have to convert back to degrees

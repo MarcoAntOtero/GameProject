@@ -9,20 +9,15 @@
 #ifndef GAME_H
 #define GAME_H
 
-const float enemySpawnTimerMax = 10.f;
+constexpr float enemySpawnTimerMax = 5.0;
 
 class Game
 {
 private:
     //Variable & Window
-    sf::RenderWindow* window{}; //pointer
+    sf::RenderWindow* window{}; //
     sf::Event event{};
-    sf::VideoMode videoMode;
-    sf::View view;
-
-    //Mouse positions
-    sf::Vector2i mousePosWindow;
-    sf::Vector2f mousePosView;
+    sf::View view;  //needed so window follows player as it moves
 
     //Text Display
     sf::Text uiText;
@@ -31,8 +26,9 @@ private:
     //Game Logic
     bool endGame;
     bool mouseHeld;
-    sf::Clock clock; // enemy Timer
+    sf::Clock enemyTimer; // enemy Timer for respawn
 
+    //Game entities and bullets
     Player* player;
     std::vector<Enemy*> enemies;
     std::vector<Bullet*> bullets;
@@ -47,7 +43,7 @@ public:
     Game();
     virtual ~Game();
 
-    void updateBullets();
+
     void checkCollision();
 
     bool running() const {return this->window->isOpen();};
@@ -55,11 +51,11 @@ public:
     void pollEvents();
 
 
-    void updateMousePos();
+    //Update functions
+    void updateBullets();
     void updateEnemies();
     void updateText();
     void updateView();
-
     void update();
 
     void renderText(sf::RenderTarget& target);
