@@ -18,6 +18,8 @@ private:
     sf::RenderWindow* window{}; //
     sf::Event event{};
     sf::View view;  //needed so window follows player as it moves
+    sf::Texture backGroundTexture;
+    sf::RectangleShape backGround;
 
     //Text Display
     sf::Text uiText;
@@ -58,6 +60,7 @@ public:
     void updateView();
     void update();
 
+    void renderBackground(sf::RenderTarget &target);
     void renderText(sf::RenderTarget& target);
     void render();
 };

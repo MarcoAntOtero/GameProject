@@ -29,7 +29,7 @@ Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::V
     const sf::Vector2f &scale, const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets):
     Entity(texture, position, scale, origin, speed, direction, bullets), window(window) {
     this->points = 0;
-    if (!this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/playerBlast.png")){
+    if (!this->bulletTexture.loadFromFile("Resources/Effects/playerBlast.png")){
         std::cerr << "Failed to load player bullet texture" << std::endl;
     }
 }
@@ -78,7 +78,7 @@ void Player::update()
 {
     updatePlayerDirection();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (this->entityClock.getElapsedTime().asSeconds() >= 0.5) {
+        if (this->entityClock.getElapsedTime().asMicroseconds() >= 500000.0) {
             shoot();
             this->entityClock.restart();
         }
@@ -92,7 +92,7 @@ void Player::update()
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf::Vector2f &scale,
     const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets) :
     Entity(texture, position, scale, origin, speed, direction,bullets){
-    if (!this->bulletTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Effects/Beam_Big_Green.png")){
+    if (!this->bulletTexture.loadFromFile("Resources/Effects/Beam_Big_Green.png")){
         std::cerr << "Failed to load enemy bullet texture" << std::endl;
     }
 }

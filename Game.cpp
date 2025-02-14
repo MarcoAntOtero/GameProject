@@ -10,13 +10,18 @@ void Game::initVar()
 {
     //Window Variable
     this->window = nullptr;
-    this->window = new sf::RenderWindow({2560,1664}, "SFML Window");
+    this->window = new sf::RenderWindow({800,600}, "SFML Window");
     this->window->setFramerateLimit(60);
     this->player = nullptr;
+    this->backGroundTexture.loadFromFile("Resources/background.jpg");
+    this->backGroundTexture.setRepeated(true);
+    this->backGround.setScale(4.0,4.0);
+    this->backGround.setSize(sf::Vector2f(5000, 5000)); // Larger than texture
+    this->backGround.setTexture(&backGroundTexture);
+    this->backGround.setTextureRect(sf::IntRect(0, 0, 5000, 5000)); // Makes it repeat
 
-    //View Variable
-    view.setCenter(this->window->getSize().x / 2, this->window->getSize().y / 2);
-    view.setSize({2560.f, 1664.f});
+    //View Variable for window to change depending on player movement
+    this->view.setSize(this->window->getSize().x * 2.5, this->window->getSize().y * 2.5);
 
     //Game Logic
     this->endGame = false;
@@ -24,10 +29,9 @@ void Game::initVar()
 }
 
 void Game::initText() {
-    if (!this->font.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Arial.ttf")) {
+    if (!this->font.loadFromFile("Resources/Arial.ttf")) {
         std::cerr << "Error loading Arial.ttf" << std::endl;
     }
-    else{std::cout << "successful load of texture" << std::endl;}
     this->uiText.setFont(this->font);
     this->uiText.setCharacterSize(30);
     this->uiText.setFillColor(sf::Color::White);
@@ -37,8 +41,8 @@ void Game::initText() {
 void Game::initPlayer() {
     //spawns in player
     sf::Texture playerTexture;
-    if (!playerTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Spaceships/tile007.png"))
-        std::cerr << "Error loading Playertext" << std::endl;
+    if (!playerTexture.loadFromFile("Resources/Spaceships/tile007.png"))
+        std::cerr << "Error loading Player texture" << std::endl;
     const sf::Vector2f position(this->window->getSize().x / 2, this->window->getSize().y / 2);
     const sf::Vector2f scale(5.f, 5.f);
     const sf::Vector2f origin(8.f,8.f);
@@ -137,7 +141,7 @@ void Game::initEnemy(sf::Vector2f playerPos) {
     const float y = static_cast<float>(disty(gen));
 
     sf::Texture enemyTexture;
-    enemyTexture.loadFromFile("/Users/marcootero/CLionProjects/test/Resources/Spaceships/TinyShip3.png");
+    enemyTexture.loadFromFile("Resources/Spaceships/TinyShip3.png");
     const sf::Vector2f position(x,y);
     const sf::Vector2f scale(5.f, 5.f);
     const sf::Vector2f origin(8.f,8.f);
@@ -202,12 +206,18 @@ void Game::update()
 }
 
 
+
 /*
  *
  *RENDER FUNCTIONS
  *
  *
  */
+
+
+void Game::renderBackground(sf::RenderTarget &target) {
+    target.draw(this->backGround);
+}
 
 
 void Game::renderText(sf::RenderTarget &target) {
@@ -218,14 +228,10 @@ void Game::render() {
 
     //clear frame
     this->window->clear();
-
+    this->renderBackground(*this->window);
     this->player->render(*this->window);
     this->renderText(*this->window);
-    /*for (const Bullet* bullet : this->bullets) {
-        std::cout << "Rendering bullet at (" << bullet->getPosition().x << ", " << bullet->getPosition().y << ")" << std::endl;
-        bullet->render(*window);
-    }*/
-    //std::cout << bullets.size() << std::endl;
+
     for (size_t i = 0; i < this->bullets.size(); i++)
     {
         this->bullets[i]->render(*window);
