@@ -7,7 +7,7 @@
 Bullet::Bullet(const sf::Texture &texture, const float bulletDirection, const sf::Vector2f& bulletPosition,
     const sf::Vector2f& scale, const float bulletSpeed, const bool playerBullet) {
 
-    this->bulletDamage = 25;
+    this->bulletDamage = 15;
     this->bulletTexture = texture;
     this->bulletPosition = bulletPosition;
     this->bulletDirection = bulletDirection;

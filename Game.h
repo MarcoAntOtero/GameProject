@@ -10,7 +10,7 @@
 #define GAME_H
 
 constexpr float enemySpawnTimerMax = 2.5;
-
+const int MAX_TILES = 9;
 class Game
 {
 private:
@@ -18,16 +18,18 @@ private:
     sf::RenderWindow* window{}; //
     sf::Event event{};
     sf::View view;  //needed so window follows player as it moves
-    sf::Texture backGroundTexture;
-    sf::RectangleShape backGround;
 
+    //Background Texture and Tiles, always 3x3 grid
+    sf::Texture backGroundTexture;
+    sf::Vector2f tileSize;
+    std::vector<sf::RectangleShape*> tilesBackGround;
+    sf::RectangleShape* original;
     //Text Display
     sf::Text uiText;
     sf::Font font;
 
     //Game Logic
     bool endGame;
-    bool mouseHeld;
     sf::Clock enemyTimer; // enemy Timer for respawn
 
     //Game entities and bullets
@@ -45,7 +47,6 @@ public:
     Game();
     virtual ~Game();
 
-
     void checkCollision();
 
     bool running() const {return this->window->isOpen();};
@@ -54,6 +55,10 @@ public:
 
 
     //Update functions
+    void updateTiles(sf::Vector2f playerPos);
+
+    bool alreadyTile(sf::Vector2f newTilePosition);
+
     void updateBullets();
     void updateEnemies();
     void updateText();

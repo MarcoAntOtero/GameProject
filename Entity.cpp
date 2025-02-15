@@ -4,7 +4,7 @@
 
 #include "Entity.h"
 
-#include <iostream>
+
 
 Entity::Entity(const sf::Texture& texture, const sf::Vector2f& position, const sf::Vector2f& scale,
                const sf::Vector2f& origin, float speed, float direction, std::vector<Bullet*>& bullets) : bullets(bullets) {
@@ -40,11 +40,11 @@ void Player::shoot() {
     float angle = (this->sprite.getRotation() * (M_PI / 180)) - (M_PI / 2);
     float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
-    sf::Vector2f scale(4.0,4.0);
-    sf::Vector2f bulletDirection(cos(angle), sin(angle));
+    const sf::Vector2f scale(1.5,1.5);
+    const sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
 
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,25.f,playerBullet));
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,12.0,playerBullet));
 }
 
 void Player::updatePlayerDirection() {
@@ -85,6 +85,7 @@ void Player::update()
 
     }
     updatePlayerMovement();
+    //std::cout << "PLAYER POSITION: " << this->sprite.getPosition().x << "____" << this->sprite.getPosition().y << std::endl;
 
 }
 
@@ -98,15 +99,15 @@ Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf:
 }
 
 void Enemy::shoot() {
-    bool playerBullet = false;
-    float angle = (this->sprite.getRotation() * (M_PI / 180));  //convert to radians
-    float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
+    constexpr bool playerBullet = false;  //for collision check
+    const float angle = (this->sprite.getRotation() * (M_PI / 180));  //convert to radians
+    const float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
-    sf::Vector2f scale(1.5,1.5);
-    sf::Vector2f bulletDirection(cos(angle), sin(angle));
+    const sf::Vector2f scale(0.8,0.8);
+    const sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
 
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,25.f,playerBullet));
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,12.0,playerBullet));
 }
 
 

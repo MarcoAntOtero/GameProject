@@ -8,24 +8,42 @@
 //Private Functions
 void Game::initVar()
 {
+    //this->window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Player Survival", sf::Style::Fullscreen);
+    //above will not work on macOS
+
     //Window Variable
-    this->window = nullptr;
-    this->window = new sf::RenderWindow({800,600}, "SFML Window");
+    this->window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Player Survival");
     this->window->setFramerateLimit(60);
     this->player = nullptr;
+
+    //Initializing Background
+    /*
+     * 0 3 6
+     * 1 4 7
+     * 2 5 8
+     */
     this->backGroundTexture.loadFromFile("Resources/background.jpg");
-    this->backGroundTexture.setRepeated(true);
-    this->backGround.setScale(4.0,4.0);
-    this->backGround.setSize(sf::Vector2f(5000, 5000)); // Larger than texture
-    this->backGround.setTexture(&backGroundTexture);
-    this->backGround.setTextureRect(sf::IntRect(0, 0, 5000, 5000)); // Makes it repeat
+    this->tileSize.x = this->window->getSize().x;
+    this->tileSize.y = this->window->getSize().y;
+
+    for (int x = -1; x < 2; x++)
+    {
+        for (int y = -1; y < 2; y++)
+        {
+            sf::RectangleShape* tile = new sf::RectangleShape(this->tileSize);
+            tile->setPosition(static_cast<float>(x) * tileSize.x, static_cast<float>(y) * tileSize.y);
+            tile->setTexture(&backGroundTexture);
+            tilesBackGround.push_back(tile);
+        }
+    }
+    this->original = tilesBackGround[4]; //center 3x3
 
     //View Variable for window to change depending on player movement
-    this->view.setSize(this->window->getSize().x * 2.5, this->window->getSize().y * 2.5);
+    this->view.setSize(this->window->getSize().x, this->window->getSize().y);
+    this->view.zoom(0.3);
 
     //Game Logic
     this->endGame = false;
-    this->mouseHeld = false;
 }
 
 void Game::initText() {
@@ -44,13 +62,12 @@ void Game::initPlayer() {
     if (!playerTexture.loadFromFile("Resources/Spaceships/tile007.png"))
         std::cerr << "Error loading Player texture" << std::endl;
     const sf::Vector2f position(this->window->getSize().x / 2, this->window->getSize().y / 2);
-    const sf::Vector2f scale(5.f, 5.f);
-    const sf::Vector2f origin(8.f,8.f);
-    const float speed = 15.0;
-    const float direction = 0.f;
+    const sf::Vector2f scale(2.0, 2.0);
+    const sf::Vector2f origin(8.0,8.0);
+    constexpr float speed = 8.0;
+    constexpr float direction = 0.0;
 
     this->player = new Player(*this->window,playerTexture,position,scale, origin, speed, direction, bullets);
-
 }
 
 Game::Game() {
@@ -61,14 +78,20 @@ Game::Game() {
 
 Game::~Game() {
     delete this->window;
-    for (const auto &enemy : enemies) {
-        delete enemy;
+    for (const auto &tile : tilesBackGround)
+    {
+        delete tile;
     }
-    for (const auto &bullet : bullets) {
+    for (const auto &bullet : bullets)
+    {
         delete bullet;
     }
+    for (const auto &enemy : enemies)
+    {
+        delete enemy;
+    }
     delete this->player;
-    enemies.clear();
+
 }
 
 
@@ -95,6 +118,7 @@ void Game::pollEvents()
     }
 }
 
+
 void Game::checkCollision() {
     for (size_t i = 0; i < this->bullets.size(); i++) {
         if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()) && !bullets[i]->getPlayerBullet())
@@ -115,18 +139,6 @@ void Game::checkCollision() {
     }
 }
 
-void Game::updateBullets() {
-    for (size_t i = 0; i < this->bullets.size(); i++) {
-        bullets[i]->update();
-        if (!bullets[i]->isActive()) {
-            delete bullets[i];
-            bullets.erase(bullets.begin() + i);
-        }
-    }
-    checkCollision();
-}
-
-
 
 void Game::initEnemy(sf::Vector2f playerPos) {
     //needs playerpos so the enemy can follow it
@@ -143,14 +155,88 @@ void Game::initEnemy(sf::Vector2f playerPos) {
     sf::Texture enemyTexture;
     enemyTexture.loadFromFile("Resources/Spaceships/TinyShip3.png");
     const sf::Vector2f position(x,y);
-    const sf::Vector2f scale(5.f, 5.f);
+    const sf::Vector2f scale(2.0, 2.0);
     const sf::Vector2f origin(8.f,8.f);
-    const float speed = 10.0;
-    const float direction = 0.0;
+    constexpr float speed = 5.0;
+    constexpr float direction = 0.0;
     this->enemies.push_back(new Enemy(enemyTexture,position, scale, origin, speed, direction,bullets));
 }
 
+/*
+ *
+ *
+ *
+ *Update FUNCTIONs
+ *
+ *
+ *
+ */
 
+void Game::updateTiles(sf::Vector2f playerPos)
+{
+    //Check if player has moved from original tile
+    if (this->original->getGlobalBounds().contains(playerPos)) {return;}
+
+    sf::RectangleShape* current = nullptr;
+    for (int i = 0; i < tilesBackGround.size(); i++)
+    {
+        if (tilesBackGround[i]->getGlobalBounds().contains(playerPos)) {current = tilesBackGround[i];}
+    }
+
+    //Delete for loops
+    std::vector<int> toBeDeleted;
+    for (int i = 0; i < tilesBackGround.size(); i++)
+        {
+        float distanceX = std::abs(tilesBackGround[i]->getPosition().x - playerPos.x);
+        float distanceY = std::abs(tilesBackGround[i]->getPosition().y - playerPos.y);
+        float maxDistanceX = this->window->getSize().x;
+        float maxDistanceY = this->window->getSize().y;
+        if (distanceX > maxDistanceX || distanceY > maxDistanceY){toBeDeleted.push_back(i);}
+    }
+    for (int i = toBeDeleted.size() - 1; i >= 0; i--)
+    {
+        delete tilesBackGround[toBeDeleted[i]];
+        tilesBackGround.erase(tilesBackGround.begin() + toBeDeleted[i]);
+    }
+
+    //Add tiles for loops
+    for (int x = -1; x < 2; x++)
+    {
+        for (int y = -1; y < 2; y++)
+        {
+            sf::Vector2f newTilePosition((static_cast<float>(x) * tileSize.x + current->getPosition().x),
+                (static_cast<float>(y) * tileSize.y + current->getPosition().y));
+            if (!alreadyTile(newTilePosition)) {
+                sf::RectangleShape* tile = new sf::RectangleShape(this->tileSize);
+                tile->setTexture(&backGroundTexture);
+                tile->setPosition(newTilePosition);
+                tilesBackGround.push_back(tile);
+            }
+        }
+    }
+
+    this->original = current;
+}
+
+bool Game::alreadyTile(sf::Vector2f newTilePosition) {
+    for (int i = 0; i < tilesBackGround.size(); i++) {
+        if (newTilePosition.x == tilesBackGround[i]->getPosition().x && newTilePosition.y == tilesBackGround[i]->getPosition().y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Game::updateBullets() {
+    for (size_t i = 0; i < this->bullets.size(); i++) {
+        bullets[i]->update();
+        if (!bullets[i]->isActive()) {
+            delete bullets[i];
+            bullets.erase(bullets.begin() + i);
+        }
+    }
+    checkCollision();
+}
 
 void Game::updateEnemies() {
     // Ensure the number of enemies is always `maxEnemies`
@@ -196,6 +282,7 @@ void Game::update()
         this->updateText();
         this->updateView();
         this->player->update(); // Update player first
+        this->updateTiles(this->player->getPosition());
         this->updateEnemies();  // Update enemies
         this->updateBullets();
     }
@@ -216,7 +303,9 @@ void Game::update()
 
 
 void Game::renderBackground(sf::RenderTarget &target) {
-    target.draw(this->backGround);
+    for (int i = 0; i < this->tilesBackGround.size(); i++) {
+        target.draw(*this->tilesBackGround[i]);
+    }
 }
 
 
