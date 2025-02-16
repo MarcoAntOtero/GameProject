@@ -23,7 +23,7 @@ class Bullet {
 
     public:
     Bullet(const sf::Texture &texture, float bulletDirection, const sf::Vector2f& bulletPosition,
-        const sf::Vector2f& scale, float bulletSpeed, bool playerBullet);
+        const sf::Vector2f& scale, int bulletDamage, float bulletSpeed, bool playerBullet);
 
     bool getPlayerBullet() const{return playerBullet;}
     int getBulletDamage () const {return this->bulletDamage;}

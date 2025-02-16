@@ -7,14 +7,15 @@
 
 
 Entity::Entity(const sf::Texture& texture, const sf::Vector2f& position, const sf::Vector2f& scale,
-               const sf::Vector2f& origin, float speed, float direction, std::vector<Bullet*>& bullets) : bullets(bullets) {
+                float speed, float direction, std::vector<Bullet*>& bullets) : bullets(bullets)
+{
     this->texture = texture;
     this->sprite.setTexture(this->texture);
     this->sprite.setPosition(position);
     this->direction = direction;
     this->sprite.setRotation(this->direction);
     this->speed = speed;
-    this->sprite.setOrigin(origin.x, origin.y);
+    this->sprite.setOrigin(this->sprite.getLocalBounds().width / 2, this->sprite.getLocalBounds().height / 2);
     this->sprite.setScale(scale.x, scale.y);
     this->health = 100;
 }
@@ -26,9 +27,12 @@ void Entity::render(sf::RenderTarget &target) const
 
 
 Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::Vector2f &position,
-    const sf::Vector2f &scale, const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets):
-    Entity(texture, position, scale, origin, speed, direction, bullets), window(window) {
+                const sf::Vector2f &scale, float speed, float direction,
+                std::vector<Bullet*>& bullets):
+                Entity(texture, position, scale, speed, direction, bullets), window(window)
+{
     this->points = 0;
+
     if (!this->bulletTexture.loadFromFile("Resources/Effects/playerBlast.png")){
         std::cerr << "Failed to load player bullet texture" << std::endl;
     }
@@ -40,11 +44,13 @@ void Player::shoot() {
     float angle = (this->sprite.getRotation() * (M_PI / 180)) - (M_PI / 2);
     float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
-    const sf::Vector2f scale(1.5,1.5);
+    const sf::Vector2f scale(1.25,1.25);
     const sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
-
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,12.0,playerBullet));
+    constexpr float bulletSpeed = 9.0;
+    constexpr int bulletDamage = 25;
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,
+        scale,bulletDamage,bulletSpeed,playerBullet));
 }
 
 void Player::updatePlayerDirection() {
@@ -85,17 +91,41 @@ void Player::update()
 
     }
     updatePlayerMovement();
-    //std::cout << "PLAYER POSITION: " << this->sprite.getPosition().x << "____" << this->sprite.getPosition().y << std::endl;
-
 }
 
 
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf::Vector2f &scale,
-    const sf::Vector2f &origin, float speed, float direction, std::vector<Bullet*>& bullets) :
-    Entity(texture, position, scale, origin, speed, direction,bullets){
+    float speed, float direction, std::vector<Bullet*>& bullets) :
+    Entity(texture, position, scale, speed, direction,bullets){
+    this->frameDuration = 0.1;
+    this->frameIndex = 0;
+    this->toBeDestroyed = false;
+    this->isActive = true;
     if (!this->bulletTexture.loadFromFile("Resources/Effects/Beam_Big_Green.png")){
         std::cerr << "Failed to load enemy bullet texture" << std::endl;
     }
+    if (!this->destroyedEnemyTexture.loadFromFile("Resources/Effects/Explosion_Medium.png")){
+        std::cerr << "Failed to load enemy destroyed texture" << std::endl;
+    }
+
+}
+
+void Enemy::destroyed()
+{
+    int frameWidth = 40;
+    int frameHeight = 40;
+
+    // Start animation if it's not already started
+    if (this->frameIndex == 0) {
+        this->sprite.setTexture(this->destroyedEnemyTexture);
+    }
+
+     if (this->destroyedClock.getElapsedTime().asSeconds() >= this->frameDuration)
+     {
+        this->sprite.setTextureRect(sf::IntRect((frameWidth * frameIndex), 0, frameWidth, frameHeight));
+        this->destroyedClock.restart();
+        frameIndex++;
+     }
 }
 
 void Enemy::shoot() {
@@ -103,11 +133,13 @@ void Enemy::shoot() {
     const float angle = (this->sprite.getRotation() * (M_PI / 180));  //convert to radians
     const float offset = this->sprite.getLocalBounds().height / 2; // Distance from center to tip, so spawns at tip
 
-    const sf::Vector2f scale(0.8,0.8);
+    const sf::Vector2f scale(0.7,0.7);
     const sf::Vector2f bulletDirection(cos(angle), sin(angle));
     const sf::Vector2f bulletPosition = {this->sprite.getPosition() + bulletDirection * offset};
-
-    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,scale,12.0,playerBullet));
+    constexpr float bulletSpeed = 8.0;
+    constexpr int bulletDamage = 10;
+    bullets.push_back(new Bullet(this->bulletTexture,angle,bulletPosition,
+        scale,bulletDamage,bulletSpeed,playerBullet));
 }
 
 
@@ -130,7 +162,8 @@ void Enemy::updateEnemyDirection() {
     this->sprite.setRotation(this->direction);
 }
 
-void Enemy::updateEnemyMovement() {
+void Enemy::updateEnemyMovement()
+{
     sf::Vector2f direction = playerPos - this->sprite.getPosition();  //direction vector
     float vecLength = sqrt((direction.x * direction.x) + (direction.y * direction.y)); //find vector length
     if (vecLength != 0) {   //normalize vector so it has length of one
@@ -141,10 +174,12 @@ void Enemy::updateEnemyMovement() {
 
 void Enemy::update()
 {
+    if (toBeDestroyed) {return;} //if to be destroyed do not move or aim just die
     updateEnemyDirection();
     updateEnemyMovement();
     if (this->entityClock.getElapsedTime().asSeconds() >= 0.5) {
         shoot();
         this->entityClock.restart();
     }
+
 }

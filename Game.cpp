@@ -22,7 +22,7 @@ void Game::initVar()
      * 1 4 7
      * 2 5 8
      */
-    this->backGroundTexture.loadFromFile("Resources/background.jpg");
+    this->backGroundTexture.loadFromFile("Resources/SpaceBackground.png");
     this->tileSize.x = this->window->getSize().x;
     this->tileSize.y = this->window->getSize().y;
 
@@ -63,11 +63,10 @@ void Game::initPlayer() {
         std::cerr << "Error loading Player texture" << std::endl;
     const sf::Vector2f position(this->window->getSize().x / 2, this->window->getSize().y / 2);
     const sf::Vector2f scale(2.0, 2.0);
-    const sf::Vector2f origin(8.0,8.0);
-    constexpr float speed = 8.0;
+    constexpr float speed = 6.0;
     constexpr float direction = 0.0;
 
-    this->player = new Player(*this->window,playerTexture,position,scale, origin, speed, direction, bullets);
+    this->player = new Player(*this->window,playerTexture,position,scale, speed, direction, bullets);
 }
 
 Game::Game() {
@@ -121,7 +120,8 @@ void Game::pollEvents()
 
 void Game::checkCollision() {
     for (size_t i = 0; i < this->bullets.size(); i++) {
-        if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds()) && !bullets[i]->getPlayerBullet())
+        if (bullets[i]->getGlobalBounds().intersects(this->player->getGlobalBounds())
+            && !bullets[i]->getPlayerBullet())
         {
             this->player->setHealth(this->player->getHealth() - bullets[i]->getBulletDamage());
             delete bullets[i];
@@ -129,11 +129,14 @@ void Game::checkCollision() {
 
         }
         for (size_t j = 0; j < enemies.size(); j++) {
-            if (bullets[i]->getGlobalBounds().intersects(enemies[j]->getGlobalBounds()) && bullets[i]->getPlayerBullet())
+            if (!this->enemies[j]->getHealth() > 0){this->enemies[j]->setToBeDestroyed(true);}
+            else if (bullets[i]->getGlobalBounds().intersects(enemies[j]->getGlobalBounds())
+                && bullets[i]->getPlayerBullet())
             {
                 this->enemies[j]->setHealth(this->enemies[j]->getHealth() - bullets[i]->getBulletDamage());
                 delete bullets[i];      //delete bullet when intersects and lower enemy health
                 bullets.erase(bullets.begin() + i);
+
             }
         }
     }
@@ -156,10 +159,9 @@ void Game::initEnemy(sf::Vector2f playerPos) {
     enemyTexture.loadFromFile("Resources/Spaceships/TinyShip3.png");
     const sf::Vector2f position(x,y);
     const sf::Vector2f scale(2.0, 2.0);
-    const sf::Vector2f origin(8.f,8.f);
-    constexpr float speed = 5.0;
+    constexpr float speed = 5.5;
     constexpr float direction = 0.0;
-    this->enemies.push_back(new Enemy(enemyTexture,position, scale, origin, speed, direction,bullets));
+    this->enemies.push_back(new Enemy(enemyTexture,position, scale, speed, direction,bullets));
 }
 
 /*
@@ -220,7 +222,9 @@ void Game::updateTiles(sf::Vector2f playerPos)
 
 bool Game::alreadyTile(sf::Vector2f newTilePosition) {
     for (int i = 0; i < tilesBackGround.size(); i++) {
-        if (newTilePosition.x == tilesBackGround[i]->getPosition().x && newTilePosition.y == tilesBackGround[i]->getPosition().y) {
+        if (newTilePosition.x == tilesBackGround[i]->getPosition().x
+            && newTilePosition.y == tilesBackGround[i]->getPosition().y)
+        {
             return true;
         }
     }
@@ -245,13 +249,19 @@ void Game::updateEnemies() {
         this->enemyTimer.restart();
     }
 
-    // Update enemies, where they move and
-    for (size_t i = 0; i < enemies.size(); i++) {
-
+    // Update enemies, where they move and aim and if they are to be destroyed, backwards loop because
+    //deleting items in vector while iterating through it
+    for (int i = enemies.size() - 1; i >= 0 ; i--)
+    {
         enemies[i]->setPlayerPos(this->player->getPosition());
         enemies[i]->update();
-        if (this->enemies[i]->getHealth() <= 0) {
+        //Destroy animation
+        if (this->enemies[i]->getToBeDestroyed()) { //only if health is less than 0
             // Delete enemy
+            if (!this->enemies[i]->isAnimationDone()) {
+                this->enemies[i]->destroyed(); //destruction animation
+                continue; //move to next iteration and do not delete
+            }
             delete enemies[i];
             enemies.erase(enemies.begin() + i);
             this->player->setPoints(this->player->getPoints() + 10);
@@ -274,6 +284,7 @@ void Game::updateView() {
     this->window->setView(view);
 }
 
+//Hold all update functions
 void Game::update()
 {
     //all update functions

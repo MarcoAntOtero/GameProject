@@ -393,7 +393,7 @@ private:
 /// Usage example:
 /// \code
 /// // Load an image file from a file
-/// const sf::Image background("background.jpg");
+/// const sf::Image background("background.png");
 ///
 /// // Create a 20x20 image filled with black color
 /// sf::Image image({20, 20}, sf::Color::Black);

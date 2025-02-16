@@ -24,6 +24,7 @@ private:
     sf::Vector2f tileSize;
     std::vector<sf::RectangleShape*> tilesBackGround;
     sf::RectangleShape* original;
+
     //Text Display
     sf::Text uiText;
     sf::Font font;
@@ -35,6 +36,7 @@ private:
     //Game entities and bullets
     Player* player;
     std::vector<Enemy*> enemies;
+
     std::vector<Bullet*> bullets;
 
     //private functions
