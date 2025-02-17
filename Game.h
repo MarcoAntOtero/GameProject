@@ -5,12 +5,14 @@
 #include "Entity.h"
 #include <sstream>
 #include <random>
+#include <iostream>
 
-#ifndef GAME_H
-#define GAME_H
 
-constexpr float enemySpawnTimerMax = 2.5;
+constexpr int maxEnemies = 15;
+constexpr float enemySpawnTimerMax = 1.5;
 const int MAX_TILES = 9;
+const int MAX_PLAYER_HEALTH = 100;
+const int FRAMES_PER_SECOND = 60;
 class Game
 {
 private:
@@ -35,13 +37,17 @@ private:
 
     //Game entities and bullets
     Player* player;
-    std::vector<Enemy*> enemies;
+    sf::Texture healthBarTexture;
+    sf::Sprite healthBar;
+    sf::Texture healthTexture;
+    sf::Sprite health;
+    int fullHealthWidth;
 
+    std::vector<Enemy*> enemies;
     std::vector<Bullet*> bullets;
 
     //private functions
     void initVar();
-    void initText();
     void initPlayer();
     void initEnemy(sf::Vector2f playerPos);
 
@@ -53,23 +59,19 @@ public:
 
     bool running() const {return this->window->isOpen();};
     bool getEndGame() const {return this->endGame;}
-    void pollEvents();
-
 
     //Update functions
+    void pollEvents();
     void updateTiles(sf::Vector2f playerPos);
-
-    bool alreadyTile(sf::Vector2f newTilePosition);
-
+    bool alreadyTile(sf::Vector2f newTilePosition); //needed for update tiles to only create tile if needed
     void updateBullets();
     void updateEnemies();
-    void updateText();
     void updateView();
+    void updateHealthBar();
     void update();
 
+    //Render func, here and entity child classes
     void renderBackground(sf::RenderTarget &target);
-    void renderText(sf::RenderTarget& target);
+    void renderHealthBar(sf::RenderTarget &target);
     void render();
 };
-
-#endif //GAME_H

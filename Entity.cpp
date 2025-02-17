@@ -4,7 +4,11 @@
 
 #include "Entity.h"
 
-
+/*
+ *
+ *ENTITY CLASS
+ *
+ */
 
 Entity::Entity(const sf::Texture& texture, const sf::Vector2f& position, const sf::Vector2f& scale,
                 float speed, float direction, std::vector<Bullet*>& bullets) : bullets(bullets)
@@ -25,6 +29,11 @@ void Entity::render(sf::RenderTarget &target) const
     target.draw(this->sprite);
 }
 
+/*
+ *
+ * PLAYER CLASS
+ *
+ */
 
 Player::Player(sf::RenderWindow &window, const sf::Texture &texture, const sf::Vector2f &position,
                 const sf::Vector2f &scale, float speed, float direction,
@@ -84,15 +93,21 @@ void Player::update()
 {
     updatePlayerDirection();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        if (this->entityClock.getElapsedTime().asMicroseconds() >= 500000.0) {
+        if (this->entityClock.getElapsedTime().asSeconds() >= 0.5) {
             shoot();
             this->entityClock.restart();
         }
-
     }
     updatePlayerMovement();
 }
 
+/*
+ *
+ *
+ * ENEMY CLASS
+ *
+ *
+ */
 
 Enemy::Enemy(const sf::Texture& texture, const sf::Vector2f &position, const sf::Vector2f &scale,
     float speed, float direction, std::vector<Bullet*>& bullets) :
@@ -120,10 +135,10 @@ void Enemy::destroyed()
         this->sprite.setTexture(this->destroyedEnemyTexture);
     }
 
-     if (this->destroyedClock.getElapsedTime().asSeconds() >= this->frameDuration)
+     if (this->entityClock.getElapsedTime().asSeconds() >= this->frameDuration)
      {
         this->sprite.setTextureRect(sf::IntRect((frameWidth * frameIndex), 0, frameWidth, frameHeight));
-        this->destroyedClock.restart();
+        this->entityClock.restart();
         frameIndex++;
      }
 }

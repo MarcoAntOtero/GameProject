@@ -3,7 +3,6 @@
 #include <iostream>
 #include "Bullet.h"
 
-const int maxEnemies = 10;
 const int MAX_FRAMES = 9;
 // In SFML, moves clockwise and starts facing right
 enum Direction { UP = 270, DOWN = 90, LEFT = 180, RIGHT = 0 };
@@ -64,7 +63,7 @@ class Enemy : public Entity {
 private:
     int frameIndex;
     float frameDuration;
-    sf::Clock destroyedClock;
+    //sf::Clock destroyedClock;
     sf::Vector2f playerPos; //need to track
     sf::Texture destroyedEnemyTexture;
     bool toBeDestroyed;

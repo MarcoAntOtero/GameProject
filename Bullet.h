@@ -1,11 +1,9 @@
 //
 // Created by Marco Otero on 2/10/25.
 //
+#pragma once
 
-#ifndef BULLET_H
-#define BULLET_H
 #include "SFML/Graphics.hpp"
-
 #include <cmath>
 
 class Bullet {
@@ -34,7 +32,3 @@ class Bullet {
     void update();
     void render(sf::RenderTarget& target) const;
 };
-
-
-
-#endif //BULLET_H
