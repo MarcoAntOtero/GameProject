@@ -50,13 +50,13 @@ Ensure you have SFML installed on your system.
 
 Download SFML from https://www.sfml-dev.org/.
 
+
+
 Build the Game:
-
 Clone the repository:
-
 bash
 Copy
-git clone https://github.com/your-username/space-shooter.git
+git clone https://github.com/MarcoAntOtero/space-shooter.git
 Navigate to the project directory:
 
 bash
@@ -65,28 +65,10 @@ cd space-shooter
 Compile the game using your preferred build system (e.g., CMake, Makefile, or IDE).
 
 Run the Game:
-
 Execute the compiled binary:
-
 bash
 Copy
 ./space-shooter
-File Structure
-Copy
-space-shooter/
-├── Resources/              # Game assets (textures, fonts, etc.)
-├── src/                    # Source code
-│   ├── Game.cpp            # Main game logic
-│   ├── Game.h              # Game class definition
-│   ├── Player.cpp          # Player logic
-│   ├── Player.h            # Player class definition
-│   ├── Enemy.cpp           # Enemy logic
-│   ├── Enemy.h             # Enemy class definition
-│   ├── Bullet.cpp          # Bullet logic
-│   ├── Bullet.h            # Bullet class definition
-│   └── main.cpp            # Entry point
-├── CMakeLists.txt          # CMake build configuration
-└── README.md               # This file
 
 
 Controls
@@ -104,9 +86,6 @@ Developer: Marco Otero
 SFML: https://www.sfml-dev.org/
 
 Assets: Game textures from Itch.io and one of my own creation.
-
-License
-This project is licensed under the MIT License. See the LICENSE file for details.
 
 Contributing
 Contributions are welcome! If you find any bugs or have suggestions for improvements, please open an issue or submit a pull request.
